@@ -33,7 +33,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            cd Capstone_Cloud_DevOps
+            cd ~/Capstone_Cloud_DevOps
             python3 -m venv venv
             . venv/bin/activate
             make install
@@ -48,7 +48,7 @@ jobs:
       - run:
           name: run lint
           command: |
-            cd Capstone_Cloud_DevOps
+            cd ~/Capstone_Cloud_DevOps
             . venv/bin/activate
             make lint 
     
@@ -74,7 +74,10 @@ jobs:
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
-          command: pytest
+          command: |
+              cd ~/Capstone_Cloud_DevOps
+              pip install -U pytest
+              python -m pytest -vv tests/*.py
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
