@@ -9,7 +9,7 @@
 setup:
 	# Create python virtualenv & source it
 	# source ~/.devops/bin/activate
-	python3.7 -m venv ~/.devops
+	python3.8 -m venv ~/.devops
 	source ~/.devops/bin/activate
 
 env:
@@ -30,7 +30,7 @@ install:
 
 test:
 	# Additional, optional, tests could go here
-	#python -m pytest -vv --cov=myrepolib tests/*.py
+	#python -m pytest -vv --cov=myrepolib test/*.py
 	#python -m pytest --nbval notebook.ipynb
 
 lint:
