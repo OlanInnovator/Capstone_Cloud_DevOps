@@ -1,4 +1,4 @@
-FROM python:3.7.3-stretch
+FROM python:3.8
 
 ## Step 1:
 # Create a working directory
@@ -6,7 +6,7 @@ WORKDIR /app
 
 ## Step 2:
 # Copy source code to working directory
-COPY . project-ml-microservice-kubernetes/app.py /app/
+COPY . Capstone_Cloud_DevOps/app.py /app/
 
 ## Step 3:
 # Install packages from requirements.txt
