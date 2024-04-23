@@ -20,8 +20,8 @@ jobs:
   build:
     docker:
         # Use the same Docker base as the project
-      - image: python:3.7.3-stretch
-    working_directory: ~/repo
+      - image: python:3.8
+    working_directory: ~/Capstone_Cloud_DevOps
     steps:
       - checkout
 # Download and cache dependencies
