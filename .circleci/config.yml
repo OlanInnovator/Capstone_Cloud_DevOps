@@ -33,6 +33,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            cd Capstone_Cloud_DevOps
             python3 -m venv venv
             . venv/bin/activate
             make install
@@ -47,6 +48,7 @@ jobs:
       - run:
           name: run lint
           command: |
+            cd Capstone_Cloud_DevOps
             . venv/bin/activate
             make lint 
     
