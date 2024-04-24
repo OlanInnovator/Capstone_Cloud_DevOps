@@ -51,6 +51,13 @@ jobs:
             # cd ~/Capstone_Cloud_DevOps
             . venv/bin/activate
             make lint 
+      # run lint!
+      - run:
+          name: run docker
+          command: |
+            # cd ~/Capstone_Cloud_DevOps
+            . venv/bin/activate
+            ./run_docker.sh 
     
   build-and-test: # This is the name of the job, feel free to change it to better match what you're trying to do!
     # These next lines defines a Docker executors: https://circleci.com/docs/executor-types/
