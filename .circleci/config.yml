@@ -63,7 +63,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["0c:55:f7:d7:ad:e3:73:19:0b:e6:c6:46:5c:04:76:94"] # You can get this ID in the section where you registered the SSH Key
+          fingerprints: ["SHA256:ATm5cgo5+68fvMKhXz/AItoTGu2FQ+TImSi/99cK+c8"] # You can get this ID in the section where you registered the SSH Key
       - run:
           name: Install dependencies
           command: |
@@ -114,7 +114,7 @@ jobs:
           command: |
             # cd ~/Capstone_Cloud_DevOps
             . venv/bin/activate
-            ./run_docker.sh 
+            #./run_docker.sh 
     
   build-and-test: # This is the name of the job, feel free to change it to better match what you're trying to do!
     # These next lines defines a Docker executors: https://circleci.com/docs/executor-types/
@@ -146,8 +146,9 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
+  capston: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
       - build
+      - create_infrastructure
