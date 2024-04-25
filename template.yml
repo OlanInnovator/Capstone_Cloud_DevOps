@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2024-04-25
+Description: Capstone_Cloud_DevOps
+Resources:
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      KeyName: AWS_Keypair_Capstone_Cloud_DevOps
+      ImageId: 'ami-04b3c39a8a1c62b76'
+      InstanceType: t3.micro
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
