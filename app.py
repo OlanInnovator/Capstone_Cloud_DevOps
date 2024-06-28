@@ -24,6 +24,11 @@ def home():
     html = f"<h3>Sklearn Prediction Home</h3>"
     return html.format(format)
 
+@app.route("/about-us")
+def aboutus():
+    html = f"<h2>Olan Natwest Innovator</h2>"
+    return html.format(format) 
+
 @app.route("/predict", methods=['POST'])
 def predict():
     """Performs an sklearn prediction

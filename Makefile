@@ -9,8 +9,8 @@
 setup:
 	# Create python virtualenv & source it
 	# source ~/.devops/bin/activate
-	python3.8 -m venv ~/.devops
-	source ~/.devops/bin/activate
+	python3.7 -m venv ~/.devops
+	source ~/.devops/Scripts/activate
 
 env:
 	#Show information about environment
@@ -23,8 +23,8 @@ install:
 	# This should be run from inside a virtualenv
 	pip install --upgrade pip &&\
 		pip install -r requirements.txt
-	wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 #&&\
-	chmod +x /bin/hadolint
+	#wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 && \
+	#chmod +x /bin/hadolint
 	#docker run --rm -i hadolint/hadolint < Dockerfile
 	
 
