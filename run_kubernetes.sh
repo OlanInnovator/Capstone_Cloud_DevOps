@@ -4,12 +4,12 @@
 
 # Step 1:
 # This is your Docker ID/path
-dockerpath="olaninnovator/myapp_proj44:latest"
+dockerpath="olaninnovator/capstone-cloud-app:latest"
 
 echo $dockerpath
 # Step 2
 # Run the Docker Hub container with kubernetes
-kubectl create deploy python-mykubemetes --image=$dockerpath
+kubectl create deploy python-capstoneubemetes --image=$dockerpath
 echo $dockerpath
 
 ## See the status
@@ -25,4 +25,5 @@ kubectl wait --for=condition=Ready p"$(kubectl get pod -o name | grep planning-a
 #aws-node-6l4pg
 # Step 4:
 # Forward the container port to a host
+echo "$(kubectl get pod -o name | grep planning-api)" 
 kubectl port-forward "$(kubectl get pod -o name | grep planning-api)" --address 0.0.0.0 5000:5000

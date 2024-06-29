@@ -3,7 +3,8 @@ from flask.logging import create_logger
 import logging
 
 import pandas as pd
-from sklearn.externals import joblib
+#from sklearn.externals 
+#import joblib
 from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
@@ -20,15 +21,15 @@ def scale(payload):
 
 @app.route("/")
 def home():
-    html = f"<h3>Sklearn Prediction Home</h3>"
+    html = f"<h3>Sklearn Prediction Home </h3> <p> follow this link for about us;  http://127.0.0.1:5000/about-us</p>"
     return html.format(format)
 
 @app.route("/about-us")
 def aboutus():
-    html = f"<h2>Olan Natwest Innovator</h2>"
+    html = f"<h2>Olan Natwest Innovator</h2>  <p>try out prediction app pn this link prototype: http://127.0.0.1:5000/predict</p></h2>"
     return html.format(format) 
 
-@app.route("/predict", methods=['POST'])
+@app.route("/predict", methods=['GET'])
 def predict():
     """Performs an sklearn prediction
         
@@ -61,16 +62,17 @@ def predict():
     # Logging the input payload
     json_payload = request.json
     LOG.info(f"JSON payload: \n{json_payload}")
-    inference_payload = pd.DataFrame(json_payload)
+    inference_payload = json_payload
     LOG.info(f"Inference payload DataFrame: \n{inference_payload}")
     # scale the input
-    scaled_payload = scale(inference_payload)
+    #scaled_payload = scale(inference_payload)
+        # load pretrained model as clf
+    #clf = joblib.load("./model_data/boston_housing_prediction.joblib")
     # get an output prediction from the pretrained model, clf
-    prediction = list(clf.predict(scaled_payload))
+    #prediction = list(clf.predict(scaled_payload))
+    #prediction = list(clf.predict(scaled_payload))
     # TO DO:  Log the output prediction value
-    return jsonify({'prediction': prediction})
+    return jsonify({'prediction': inference_payload})
 
 if __name__ == "__main__":
-    # load pretrained model as clf
-    clf = joblib.load("./model_data/boston_housing_prediction.joblib")
     app.run(host='0.0.0.0', port=80, debug=True) # specify port=80

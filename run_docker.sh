@@ -5,9 +5,9 @@
 # Step 1:
 # Build image and add a descriptive tag
 # dockerid=<your docker ID/path>
-dockerid="capstone_Cloud_app"
-docker build -t $dockerid .
-docker tag $dockerid $dockerid:latest
+dockerid="capstone-cloud-app"
+docker build -t capstone-cloud-app .
+docker tag capstone-cloud-app capstone-cloud-app:latest
 
 # Step 2: 
 # List docker images
