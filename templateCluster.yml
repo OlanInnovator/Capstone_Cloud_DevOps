@@ -39,17 +39,19 @@ Resources:
         BootstrapClusterCreatorAdminPermissions: true
       KubernetesNetworkConfig:
         IpFamily: ipv4
-      Name: !Sub ${AWS::StackName}Cluster
+      Name: capstoneclusterProd
       ResourcesVpcConfig:
         EndpointPrivateAccess: false
         EndpointPublicAccess: true
         SecurityGroupIds:
           - !Ref ControlPlaneSecurityGroup
         SubnetIds:
-          - !Ref SubnetPublicUSEAST1C
-          - !Ref SubnetPublicUSEAST1D
-          - !Ref SubnetPrivateUSEAST1C
-          - !Ref SubnetPrivateUSEAST1D
+          - !Ref SubnetPublicUSEAST2A
+          - !Ref SubnetPublicUSEAST2C
+          - !Ref SubnetPublicUSEAST2B
+          - !Ref SubnetPrivateUSEAST2A
+          - !Ref SubnetPrivateUSEAST2C
+          - !Ref SubnetPrivateUSEAST2B
       RoleArn: !GetAtt ServiceRole.Arn
       Tags:
         - Key: Name
@@ -100,7 +102,7 @@ Resources:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !GetAtt NATIP.AllocationId
-      SubnetId: !Ref SubnetPublicUSEAST1C
+      SubnetId: !Ref SubnetPublicUSEAST2A
       Tags:
         - Key: Name
           Value: !Sub ${AWS::StackName}/NATGateway
@@ -111,31 +113,44 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${AWS::StackName}/NATIP
-  NATPrivateSubnetRouteUSEAST1C:
+  NATPrivateSubnetRouteUSEAST2A:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NATGateway
-      RouteTableId: !Ref PrivateRouteTableUSEAST1C
-  NATPrivateSubnetRouteUSEAST1D:
+      RouteTableId: !Ref PrivateRouteTableUSEAST2A
+  NATPrivateSubnetRouteUSEAST2B:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NATGateway
-      RouteTableId: !Ref PrivateRouteTableUSEAST1D
-  PrivateRouteTableUSEAST1C:
+      RouteTableId: !Ref PrivateRouteTableUSEAST2B
+  NATPrivateSubnetRouteUSEAST2C:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+      RouteTableId: !Ref PrivateRouteTableUSEAST2C
+  PrivateRouteTableUSEAST2A:
     Type: AWS::EC2::RouteTable
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}/PrivateRouteTableUSEAST1C
+          Value: !Sub ${AWS::StackName}/PrivateRouteTableUSEAST2A
       VpcId: !Ref VPC
-  PrivateRouteTableUSEAST1D:
+  PrivateRouteTableUSEAST2B:
     Type: AWS::EC2::RouteTable
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName}/PrivateRouteTableUSEAST1D
+          Value: !Sub ${AWS::StackName}/PrivateRouteTableUSEAST2B
+      VpcId: !Ref VPC
+  PrivateRouteTableUSEAST2C:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/PrivateRouteTableUSEAST2C
       VpcId: !Ref VPC
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -152,26 +167,36 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
     DependsOn:
       - VPCGatewayAttachment
-  RouteTableAssociationPrivateUSEAST1C:
+  RouteTableAssociationPrivateUSEAST2A:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTableUSEAST1C
-      SubnetId: !Ref SubnetPrivateUSEAST1C
-  RouteTableAssociationPrivateUSEAST1D:
+      RouteTableId: !Ref PrivateRouteTableUSEAST2A
+      SubnetId: !Ref SubnetPrivateUSEAST2A
+  RouteTableAssociationPrivateUSEAST2B:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTableUSEAST1D
-      SubnetId: !Ref SubnetPrivateUSEAST1D
-  RouteTableAssociationPublicUSEAST1C:
+      RouteTableId: !Ref PrivateRouteTableUSEAST2B
+      SubnetId: !Ref SubnetPrivateUSEAST2B
+  RouteTableAssociationPrivateUSEAST2C:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableUSEAST2C
+      SubnetId: !Ref SubnetPrivateUSEAST2C
+  RouteTableAssociationPublicUSEAST2A:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref SubnetPublicUSEAST1C
-  RouteTableAssociationPublicUSEAST1D:
+      SubnetId: !Ref SubnetPublicUSEAST2A
+  RouteTableAssociationPublicUSEAST2B:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref SubnetPublicUSEAST1D
+      SubnetId: !Ref SubnetPublicUSEAST2B
+  RouteTableAssociationPublicUSEAST2C:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref SubnetPublicUSEAST2C
   ServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -193,51 +218,74 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${AWS::StackName}/ServiceRole
-  SubnetPrivateUSEAST1C:
+  SubnetPrivateUSEAST2A:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-1c
-      CidrBlock: 192.168.64.0/19
-      Tags:
-        - Key: kubernetes.io/role/internal-elb
-          Value: '1'
-        - Key: Name
-          Value: !Sub ${AWS::StackName}/SubnetPrivateUSEAST1C
-      VpcId: !Ref VPC
-  SubnetPrivateUSEAST1D:
-    Type: AWS::EC2::Subnet
-    Properties:
-      AvailabilityZone: us-east-1d
+      AvailabilityZone: us-east-2a
       CidrBlock: 192.168.96.0/19
       Tags:
         - Key: kubernetes.io/role/internal-elb
           Value: '1'
         - Key: Name
-          Value: !Sub ${AWS::StackName}/SubnetPrivateUSEAST1D
+          Value: !Sub ${AWS::StackName}/SubnetPrivateUSEAST2A
       VpcId: !Ref VPC
-  SubnetPublicUSEAST1C:
+  SubnetPrivateUSEAST2B:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-1c
+      AvailabilityZone: us-east-2b
+      CidrBlock: 192.168.160.0/19
+      Tags:
+        - Key: kubernetes.io/role/internal-elb
+          Value: '1'
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/SubnetPrivateUSEAST2B
+      VpcId: !Ref VPC
+  SubnetPrivateUSEAST2C:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-2c
+      CidrBlock: 192.168.128.0/19
+      Tags:
+        - Key: kubernetes.io/role/internal-elb
+          Value: '1'
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/SubnetPrivateUSEAST2C
+      VpcId: !Ref VPC
+  SubnetPublicUSEAST2A:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-2a
       CidrBlock: 192.168.0.0/19
       MapPublicIpOnLaunch: true
       Tags:
         - Key: kubernetes.io/role/elb
           Value: '1'
         - Key: Name
-          Value: !Sub ${AWS::StackName}/SubnetPublicUSEAST1C
+          Value: !Sub ${AWS::StackName}/SubnetPublicUSEAST2A
       VpcId: !Ref VPC
-  SubnetPublicUSEAST1D:
+  SubnetPublicUSEAST2B:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: us-east-1d
+      AvailabilityZone: us-east-2b
+      CidrBlock: 192.168.64.0/19
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: kubernetes.io/role/elb
+          Value: '1'
+        - Key: Name
+          Value: !Sub ${AWS::StackName}/SubnetPublicUSEAST2B
+      VpcId: !Ref VPC
+  SubnetPublicUSEAST2C:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-2c
       CidrBlock: 192.168.32.0/19
       MapPublicIpOnLaunch: true
       Tags:
         - Key: kubernetes.io/role/elb
           Value: '1'
         - Key: Name
-          Value: !Sub ${AWS::StackName}/SubnetPublicUSEAST1D
+          Value: !Sub ${AWS::StackName}/SubnetPublicUSEAST2C
       VpcId: !Ref VPC
   VPC:
     Type: AWS::EC2::VPC
@@ -287,15 +335,17 @@ Outputs:
   SubnetsPrivate:
     Value: !Join
       - ','
-      - - !Ref SubnetPrivateUSEAST1C
-        - !Ref SubnetPrivateUSEAST1D
+      - - !Ref SubnetPrivateUSEAST2A
+        - !Ref SubnetPrivateUSEAST2C
+        - !Ref SubnetPrivateUSEAST2B
     Export:
       Name: !Sub ${AWS::StackName}::SubnetsPrivate
   SubnetsPublic:
     Value: !Join
       - ','
-      - - !Ref SubnetPublicUSEAST1C
-        - !Ref SubnetPublicUSEAST1D
+      - - !Ref SubnetPublicUSEAST2A
+        - !Ref SubnetPublicUSEAST2C
+        - !Ref SubnetPublicUSEAST2B
     Export:
       Name: !Sub ${AWS::StackName}::SubnetsPublic
   VPC:
