@@ -15,7 +15,7 @@ setup:
 env:
 	#Show information about environment
 	which python3
-	python3 --version
+	python3.7 --version
 	which pytest
 	which pylint
 
