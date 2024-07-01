@@ -132,7 +132,7 @@ jobs:
           command: |
             # cd ~/Capstone_Cloud_DevOps
             . venv/bin/activate
-            ./run_docker.sh 
+            #./run_docker.sh 
     
   test-build: # This is the name of the job, feel free to change it to better match what you're trying to do!
     # These next lines defines a Docker executors: https://circleci.com/docs/executor-types/
