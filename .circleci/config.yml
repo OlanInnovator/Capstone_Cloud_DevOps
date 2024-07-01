@@ -24,33 +24,56 @@ commands:
     steps:
       - run: echo << parameters.id >>
 
-  # Exercise - Rollback
-  destroy_environment:
-    steps:
+  # Exercise - Rollback          
+  cleanup:
+     docker:
+       - image: amazon/aws-cli
+     steps:
+      - checkout
       - run:
-          name: Destroy environment
-          # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable 
-          # ${CIRCLE_WORKFLOW_ID:0:5} takes the first 5 chars of the variable CIRCLE_CI_WORKFLOW_ID 
-          when: on_fail
-          command: |
-            aws cloudformation delete-stack --stack-name=capstoneStack-${CIRCLE_WORKFLOW_ID:0:5}
-            aws cloudformation describe-stacks --stack-name=capstoneStack-${CIRCLE_WORKFLOW_ID:0:5}
-          
+           name: Get old stack workflow id & Remove old stack and files
+           command: |
+             export OldWorkflowID=$(aws cloudformation \
+                   list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                   --no-paginate --output text)
+             echo OldWorkflowID: "${OldWorkflowID}"
+             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+              # Fetch the stack names         
+             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                   --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+               echo Stack names: "${STACKS[@]}"
+              for OldWorkflowID in "${STACKS[@]}"; do
+              if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ $OldWorkflowID ]]
+              then
+                echo ------ Cleaning up old jobs ------
+                aws s3 rm "s3://${oldWorkFlowID}" --recursive
+                aws cloudformation delete-stack --stack-name "capstoneclusterProd-${oldWorkFlowID}"
+                # aws cloudformation delete-stack --stack-name "capstoneclusterProd-${OldWorkFlowID}"
+                # aws cloudformation delete-stack --stack-name "capstoneclusterProd-${OldWorkFlowID}"
+              else
+                 echo ------ Nothing to cleanup - "Current: $OldWorkflowID" ------
+              fi
+              done          
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  create_infrastructure: 
+  create-cluster: 
     docker:
       - image: amazon/aws-cli
     steps:
       - checkout
       - run:
-          name: Create Cloudformation Stack
+          name: Create Cloudformation Cluster Stack
           command: |
-            aws cloudformation deploy --template-file ./template.yml --stack-name capstoneclusterdev --parameter-overrides = --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+            aws cloudformation deploy --template-file ./templateCluster.yml --stack-name "capstoneclusterProd-${oldWorkFlowID}" --parameter-overrides = --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND      
+      - run:
+          name: Create Cloudformation Cluster Stack
+          command: |
+            aws cloudformation deploy --template-file ./templateCluster.yml --stack-name "capstoneclusterProd-${oldWorkFlowID}" --parameter-overrides = --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
+      
       # - run: return 1
-      - destroy_environment
+     # - destroy_environment
 
   # Exercise: Config and Deployment
   configure_infrastructure: 
@@ -104,13 +127,13 @@ jobs:
             # cd ~/Capstone_Cloud_DevOps
             . venv/bin/activate
             make lint 
-      # run lint!
+      # Build Docker!
       - run:
           name: run docker
           command: |
             # cd ~/Capstone_Cloud_DevOps
             . venv/bin/activate
-            #./run_docker.sh 
+            ./run_docker.sh 
     
   test-build: # This is the name of the job, feel free to change it to better match what you're trying to do!
     # These next lines defines a Docker executors: https://circleci.com/docs/executor-types/
